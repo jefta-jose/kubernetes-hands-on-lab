@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-volume-demo
+  namespace: volumes-lab
+spec:
+  volumes:
+    - name: site
+      ________: {}
+
+  ________:
+    - name: site-builder
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          cat > /work/index.html <<'EOF'
+          <h1>Initialized before Nginx started</h1>
+          <p>This file was created by an init container.</p>
+          EOF
+      volumeMounts:
+        - name: ________
+          mountPath: ________
+
+  containers:
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - name: http
+          containerPort: 80
+      volumeMounts:
+        - name: ________
+          mountPath: ________
+          readOnly: ________

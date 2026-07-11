@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hostpath-reader
+  namespace: volumes-lab
+spec:
+  volumes:
+    - name: node-data
+      ________:
+        path: ________
+        type: ________
+  containers:
+    - name: reader
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          while true; do
+            cat /host-data/marker.txt 2>/dev/null || echo "marker not found"
+            sleep 10
+          done
+      volumeMounts:
+        - name: node-data
+          mountPath: ________
+          readOnly: ________

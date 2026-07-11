@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: projected-config
+  namespace: volumes-lab
+data:
+  application-name: ________

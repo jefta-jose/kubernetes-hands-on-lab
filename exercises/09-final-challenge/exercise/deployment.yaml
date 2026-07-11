@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ________
+  namespace: volumes-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ________
+  template:
+    metadata:
+      labels:
+        app: ________
+    spec:
+      securityContext:
+        fsGroup: 2000
+
+      volumes:
+        - name: runtime-context
+          ________:
+            sources:
+              - configMap:
+                  name: ________
+                  items:
+                    - key: title
+                      path: title
+                    - key: message
+                      path: message
+              - secret:
+                  name: ________
+                  items:
+                    - key: display-user
+                      path: display-user
+              - downwardAPI:
+                  items:
+                    - path: pod-name
+                      fieldRef:
+                        fieldPath: ________
+                    - path: namespace
+                      fieldRef:
+                        fieldPath: ________
+
+        - name: site
+          ________: {}
+
+        - name: audit
+          ________:
+            claimName: ________
+
+      initContainers:
+        - name: page-builder
+          image: busybox:1.36
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 2000
+            runAsNonRoot: true
+          command:
+            - sh
+            - -c
+            - |
+              cat > /site/index.html <<EOF
+              <!doctype html>
+              <html>
+                <head><title>$(cat /context/title)</title></head>
+                <body>
+                  <h1>$(cat /context/title)</h1>
+                  <p>$(cat /context/message)</p>
+                  <ul>
+                    <li>User: $(cat /context/display-user)</li>
+                    <li>Pod: $(cat /context/pod-name)</li>
+                    <li>Namespace: $(cat /context/namespace)</li>
+                  </ul>
+                </body>
+              </html>
+              EOF
+          volumeMounts:
+            - name: runtime-context
+              mountPath: ________
+              readOnly: true
+            - name: site
+              mountPath: ________
+
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - name: http
+              containerPort: ________
+          volumeMounts:
+            - name: site
+              mountPath: ________
+              readOnly: ________
+
+        - name: audit-writer
+          image: busybox:1.36
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 2000
+            runAsNonRoot: true
+          command:
+            - sh
+            - -c
+            - |
+              while true; do
+                echo "$(date -Iseconds) pod=$(cat /context/pod-name)" >> /audit/events.log
+                sleep 10
+              done
+          volumeMounts:
+            - name: runtime-context
+              mountPath: ________
+              readOnly: true
+            - name: audit
+              mountPath: ________

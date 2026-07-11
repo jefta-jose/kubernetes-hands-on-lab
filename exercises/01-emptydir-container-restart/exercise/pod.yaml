@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volume-restart-demo
+  namespace: volumes-lab
+spec:
+  restartPolicy: Always
+  volumes:
+    - name: ________
+      ________: {}
+  containers:
+    - name: counter
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          current="$(cat /data/counter.txt 2>/dev/null || echo 0)"
+          while true; do
+            current=$((current + 1))
+            echo "${current}" > /data/counter.txt
+            echo "counter=${current}"
+            sleep 2
+          done
+      volumeMounts:
+        - name: ________
+          mountPath: ________

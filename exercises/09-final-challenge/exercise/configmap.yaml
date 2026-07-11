@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ________
+  namespace: volumes-lab
+data:
+  title: Kubernetes Volumes Lab
+  message: Storage, configuration, secrets, and metadata are working together.

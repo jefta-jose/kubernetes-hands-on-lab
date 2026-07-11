@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ________
+  namespace: volumes-lab
+data:
+  message.txt: |
+    Initial configuration from Kubernetes
+  unused.txt: |
+    This key should not be projected into the Pod.

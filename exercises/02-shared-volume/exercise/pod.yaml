@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared-volume-demo
+  namespace: volumes-lab
+spec:
+  volumes:
+    - name: ________
+      emptyDir: {}
+  containers:
+    - name: content-writer
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          while true; do
+            printf '<h1>Shared volume</h1><p>Generated at %s</p>\n' "$(date)" > /writer/index.html
+            sleep 5
+          done
+      volumeMounts:
+        - name: ________
+          mountPath: ________
+
+    - name: nginx
+      image: nginx:alpine
+      ports:
+        - name: http
+          containerPort: ________
+      volumeMounts:
+        - name: ________
+          mountPath: ________
+          readOnly: ________
