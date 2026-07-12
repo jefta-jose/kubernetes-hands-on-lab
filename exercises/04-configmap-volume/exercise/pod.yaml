@@ -5,12 +5,12 @@ metadata:
   namespace: volumes-lab
 spec:
   volumes:
-    - name: ________
-      ________:
-        name: ________
+    - name: config
+      configMap:
+        name: web-config
         items:
-          - key: ________
-            path: ________
+          - key: message.txt
+            path: message.txt
   containers:
     - name: reader
       image: busybox:1.36
@@ -24,6 +24,6 @@ spec:
             sleep 5
           done
       volumeMounts:
-        - name: ________
-          mountPath: ________
+        - name: config
+          mountPath: /config
           readOnly: true
