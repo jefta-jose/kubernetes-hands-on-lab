@@ -9,15 +9,15 @@ metadata:
 spec:
   volumes:
     - name: context
-      ________:
+      projected:
         sources:
           - configMap:
-              name: ________
+              name: projected-config
               items:
                 - key: application-name
                   path: application-name
           - secret:
-              name: ________
+              name: projected-secret
               items:
                 - key: api-token
                   path: api-token
@@ -25,13 +25,13 @@ spec:
               items:
                 - path: pod-name
                   fieldRef:
-                    fieldPath: ________
+                    fieldPath: metadata.name
                 - path: namespace
                   fieldRef:
-                    fieldPath: ________
+                    fieldPath: metadata.namespace
                 - path: labels
                   fieldRef:
-                    fieldPath: ________
+                    fieldPath: metadata.labels
   containers:
     - name: reader
       image: busybox:1.36
@@ -47,5 +47,5 @@ spec:
           done
       volumeMounts:
         - name: context
-          mountPath: ________
+          mountPath: /context
           readOnly: true

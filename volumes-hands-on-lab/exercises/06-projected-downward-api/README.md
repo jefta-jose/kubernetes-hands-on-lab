@@ -26,6 +26,35 @@ Complete the manifests so that the projected volume exposes:
 
 The Pod name, namespace, and labels must come from the Pod's own metadata.
 
+`projected` is a specific Kubernetes volume type.
+
+It means Kubernetes takes data from multiple sources and “projects” them as files into one shared directory:
+
+```text
+ConfigMap ──┐
+Secret ─────┼──> projected volume ──> /context/
+Pod metadata┘
+```
+
+In your manifest:
+
+```yaml
+volumes:
+  - name: context
+    projected:
+      sources:
+```
+
+`projected:` tells Kubernetes that `sources:` will contain several supported sources. Here they are:
+
+- `configMap` → `/context/application-name`
+- `secret` → `/context/api-token`
+- `downwardAPI` → `/context/pod-name`, `/context/namespace`, and `/context/labels`
+
+Without a projected volume, you would generally define separate volumes and mount points for the ConfigMap, Secret, and Downward API.
+
+So `projected` is not an arbitrary name—you must use that exact Kubernetes API field. The arbitrary name is `context`, which you choose and then reference under `volumeMounts`.
+
 ## Run
 
 ```bash
