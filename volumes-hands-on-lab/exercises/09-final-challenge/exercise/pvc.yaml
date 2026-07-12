@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ________
+  name: volume-lab-audit
   namespace: volumes-lab
 spec:
   accessModes:
-    - ________
+    - ReadWriteOnce
   resources:
     requests:
-      storage: ________
+      storage: 256Mi
