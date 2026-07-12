@@ -1,11 +1,15 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ________
+  name: lab-data
   namespace: volumes-lab
 spec:
   accessModes:
-    - ________
+  # ReadWriteOnce (RWO): read-write on one node
+  # ReadOnlyMany (ROX): read-only on many nodes
+  # ReadWriteMany (RWX): read-write on many nodes
+  # ReadWriteOncePod (RWOP): read-write by exactly one Pod cluster-wide
+    - ReadWriteOnce
   resources:
     requests:
-      storage: ________
+      storage: 256Mi

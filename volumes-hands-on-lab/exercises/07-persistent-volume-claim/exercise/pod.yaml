@@ -6,8 +6,8 @@ metadata:
 spec:
   volumes:
     - name: data
-      ________:
-        claimName: ________
+      persistentVolumeClaim:
+        claimName: lab-data
   containers:
     - name: counter
       image: busybox:1.36
@@ -24,4 +24,4 @@ spec:
           done
       volumeMounts:
         - name: data
-          mountPath: ________
+          mountPath: /data
