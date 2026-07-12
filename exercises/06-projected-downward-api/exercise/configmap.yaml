@@ -4,4 +4,4 @@ metadata:
   name: projected-config
   namespace: volumes-lab
 data:
-  application-name: ________
+  application-name: combined-data
