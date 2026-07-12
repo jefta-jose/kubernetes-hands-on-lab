@@ -6,9 +6,10 @@ metadata:
 spec:
   volumes:
     - name: node-data
-      ________:
-        path: ________
-        type: ________
+      hostPath:
+        # A hostPath must be an absolute path,
+        path: /tmp/kubernetes-volumes-lab
+        type: DirectoryOrCreate
   containers:
     - name: reader
       image: busybox:1.36
@@ -22,5 +23,5 @@ spec:
           done
       volumeMounts:
         - name: node-data
-          mountPath: ________
-          readOnly: ________
+          mountPath: /host-data
+          readOnly: true
