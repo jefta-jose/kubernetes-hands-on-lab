@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: counter
+  namespace: pv-lab-08
+spec:
+  serviceName: counter
+  replicas: ________
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      labels:
+        app: counter
+    spec:
+      containers:
+        - name: counter
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              file="________"
+              if [ ! -f "$file" ]; then
+                echo 0 > "$file"
+              fi
+              count="$(cat "$file")"
+              count=$((count + 1))
+              echo "$count" > "$file"
+              echo "pod=$HOSTNAME starts=$count" > /data/status.txt
+              sleep 3600
+          volumeMounts:
+            - name: ________
+              mountPath: ________
+  volumeClaimTemplates:
+    - metadata:
+        name: ________
+      spec:
+        storageClassName: ________
+        accessModes:
+          - ________
+        resources:
+          requests:
+            storage: ________

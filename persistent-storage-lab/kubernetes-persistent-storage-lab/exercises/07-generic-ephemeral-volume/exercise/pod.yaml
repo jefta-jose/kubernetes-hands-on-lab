@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ephemeral-worker
+  namespace: pv-lab-07
+spec:
+  containers:
+    - name: main
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          echo "temporary job output" > ________
+          sleep 3600
+      volumeMounts:
+        - name: workspace
+          mountPath: ________
+  volumes:
+    - name: workspace
+      ephemeral:
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+              - ________
+            resources:
+              requests:
+                storage: ________

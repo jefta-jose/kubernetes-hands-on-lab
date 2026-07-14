@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: writer
+  namespace: pv-lab-04
+spec:
+  containers:
+    - name: main
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          echo "created by the first pod" > ________
+          sleep 3600
+      volumeMounts:
+        - name: data
+          mountPath: ________
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: ________

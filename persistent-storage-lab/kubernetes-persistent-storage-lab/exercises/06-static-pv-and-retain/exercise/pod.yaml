@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: local-writer
+  namespace: pv-lab-06
+spec:
+  containers:
+    - name: main
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          echo "this data should be retained" > ________
+          sleep 3600
+      volumeMounts:
+        - name: data
+          mountPath: ________
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: ________

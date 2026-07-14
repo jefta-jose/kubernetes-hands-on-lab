@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-data
+  namespace: pv-lab-02
+spec:
+  storageClassName: ________
+  accessModes:
+    - ________
+  resources:
+    requests:
+      storage: ________

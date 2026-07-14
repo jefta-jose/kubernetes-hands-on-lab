@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: pv-lab-delayed
+provisioner: ________
+reclaimPolicy: Delete
+volumeBindingMode: ________
+allowVolumeExpansion: false

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: delayed-consumer
+  namespace: pv-lab-05
+spec:
+  containers:
+    - name: main
+      image: busybox:1.36
+      command: ["sh", "-c", "echo bound > /data/status.txt; sleep 3600"]
+      volumeMounts:
+        - name: data
+          mountPath: ________
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: ________
