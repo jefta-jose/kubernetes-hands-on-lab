@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: service-lab-ports
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ports-demo
+  namespace: service-lab-ports
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ports-demo
+  template:
+    metadata:
+      labels:
+        app: ports-demo
+    spec:
+      containers:
+        - name: server
+          image: hashicorp/http-echo:1.0.0
+          args:
+            - "-listen=:8080"
+            - "-text=service-port-80-to-container-port-8080"
+          ports:
+            - name: ________
+              containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ports-demo
+  namespace: service-lab-ports
+spec:
+  selector:
+    app: ________
+  ports:
+    - name: http
+      port: ________
+      targetPort: ________
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: service-client
+  namespace: service-lab-ports
+spec:
+  containers:
+    - name: client
+      image: curlimages/curl:8.10.1
+      command: ["sh", "-c", "sleep 3600"]

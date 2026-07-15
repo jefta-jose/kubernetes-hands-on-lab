@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: service-lab-readiness
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ready-backend
+  namespace: service-lab-readiness
+  labels:
+    app: readiness-demo
+spec:
+  containers:
+    - name: server
+      image: hashicorp/http-echo:1.0.0
+      args:
+        - "-listen=:5678"
+        - "-text=ready-backend"
+      ports:
+        - name: http
+          containerPort: 5678
+      readinessProbe:
+        tcpSocket:
+          port: ________
+        initialDelaySeconds: 1
+        periodSeconds: 2
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unready-backend
+  namespace: service-lab-readiness
+  labels:
+    app: readiness-demo
+spec:
+  containers:
+    - name: server
+      image: hashicorp/http-echo:1.0.0
+      args:
+        - "-listen=:5678"
+        - "-text=unready-backend"
+      ports:
+        - name: http
+          containerPort: 5678
+      readinessProbe:
+        tcpSocket:
+          port: ________
+        initialDelaySeconds: 1
+        periodSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: readiness-demo
+  namespace: service-lab-readiness
+spec:
+  selector:
+    app: ________
+  ports:
+    - name: http
+      port: 80
+      targetPort: ________
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: service-client
+  namespace: service-lab-readiness
+spec:
+  containers:
+    - name: client
+      image: curlimages/curl:8.10.1
+      command: ["sh", "-c", "sleep 3600"]

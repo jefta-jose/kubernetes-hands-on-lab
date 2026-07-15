@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: service-lab-final
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-api
+  namespace: service-lab-final
+spec:
+  replicas: ________
+  selector:
+    matchLabels:
+      app: ________
+  template:
+    metadata:
+      labels:
+        app: ________
+    spec:
+      containers:
+        - name: quote-api
+          image: hashicorp/http-echo:1.0.0
+          args:
+            - "-listen=:8080"
+            - "-text=stable-networking-for-ephemeral-pods"
+          ports:
+            - name: ________
+              containerPort: 8080
+          readinessProbe:
+            tcpSocket:
+              port: ________
+            initialDelaySeconds: 1
+            periodSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quote-api
+  namespace: service-lab-final
+spec:
+  selector:
+    app: ________
+  ports:
+    - name: http
+      port: ________
+      targetPort: ________
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quote-api-headless
+  namespace: service-lab-final
+spec:
+  clusterIP: ________
+  selector:
+    app: ________
+  ports:
+    - name: http
+      port: 80
+      targetPort: ________
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quote-api-public
+  namespace: service-lab-final
+spec:
+  type: ________
+  selector:
+    app: ________
+  ports:
+    - name: http
+      port: 80
+      targetPort: ________
+      nodePort: ________
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: final-client
+  namespace: service-lab-final
+spec:
+  containers:
+    - name: client
+      image: curlimages/curl:8.10.1
+      command:
+        - sh
+        - -c
+        - "echo Stable service DNS: ________; sleep 3600"

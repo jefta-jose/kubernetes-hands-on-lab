@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: service-lab-nodeport
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: public-api
+  namespace: service-lab-nodeport
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: public-api
+  template:
+    metadata:
+      labels:
+        app: public-api
+    spec:
+      containers:
+        - name: server
+          image: hashicorp/http-echo:1.0.0
+          args:
+            - "-listen=:8080"
+            - "-text=public-api"
+          ports:
+            - name: http
+              containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: public-api
+  namespace: service-lab-nodeport
+spec:
+  type: ________
+  selector:
+    app: public-api
+  ports:
+    - name: http
+      port: ________
+      targetPort: ________
+      nodePort: ________
