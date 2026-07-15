@@ -2,16 +2,16 @@
 set -euo pipefail
 
 echo "== StorageClasses =="
-kubectl get ________
+kubectl get storageclass
 
 echo
 echo "== PersistentVolumes =="
-kubectl get ________
-
-echo
-echo "== CSI drivers =="
-kubectl get ________
+kubectl get persistentvolume
 
 echo
 echo "== Default StorageClass =="
-kubectl get sc -o jsonpath='{range .items[?(@.metadata.annotations.storageclass\.kubernetes\.io/is-default-class=="________")]}{.metadata.name}{"\t"}{.provisioner}{"\n"}{end}'
+kubectl get sc -o jsonpath='{range .items[?(@.metadata.annotations.storageclass\.kubernetes\.io/is-default-class=="true")]}{.metadata.name}{"\t"}{.provisioner}{"\n"}{end}'
+
+echo
+echo "== CSI drivers =="
+kubectl get csidriver

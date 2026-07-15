@@ -11,12 +11,12 @@ spec:
         - sh
         - -c
         - |
-          echo "this data should be retained" > ________
+          echo "this data should be retained" > /data/retained.txt
           sleep 3600
       volumeMounts:
         - name: data
-          mountPath: ________
+          mountPath: /data
   volumes:
     - name: data
       persistentVolumeClaim:
-        claimName: ________
+        claimName: local-data

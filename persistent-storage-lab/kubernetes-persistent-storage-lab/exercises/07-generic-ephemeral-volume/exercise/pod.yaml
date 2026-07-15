@@ -11,18 +11,21 @@ spec:
         - sh
         - -c
         - |
-          echo "temporary job output" > ________
+          echo "temporary job output" > /workspace/result.txt
           sleep 3600
       volumeMounts:
         - name: workspace
-          mountPath: ________
+          mountPath: /workspace
+
+# This is useful when an application needs storage with CSI capabilities but does not need that storage to outlive the Pod.
   volumes:
     - name: workspace
       ephemeral:
         volumeClaimTemplate:
           spec:
             accessModes:
-              - ________
+              - ReadWriteOnce
+
             resources:
               requests:
-                storage: ________
+                storage: 1Gi

@@ -4,7 +4,7 @@ metadata:
   name: delayed-data
   namespace: pv-lab-05
 spec:
-  storageClassName: ________
+  storageClassName: pv-lab-delayed
   accessModes:
     - ReadWriteOnce
   resources:

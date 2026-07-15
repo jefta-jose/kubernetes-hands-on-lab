@@ -3,19 +3,27 @@ kind: PersistentVolume
 metadata:
   name: pv-lab-retain-pv
 spec:
+  # size of the space to create
   capacity:
-    storage: ________
+    storage: 2Gi
+
   accessModes:
     - ReadWriteOnce
+
   storageClassName: pv-lab-static
-  persistentVolumeReclaimPolicy: ________
+
+  # With Retain, Kubernetes preserves the underlying storage after the PVC is deleted.
+  persistentVolumeReclaimPolicy: Retain
+
   local:
-    path: ________
+    path: /data/pv-lab-retain
+    
   nodeAffinity:
     required:
       nodeSelectorTerms:
         - matchExpressions:
             - key: kubernetes.io/hostname
               operator: In
+              # name of your node
               values:
-                - ________
+                - minikube

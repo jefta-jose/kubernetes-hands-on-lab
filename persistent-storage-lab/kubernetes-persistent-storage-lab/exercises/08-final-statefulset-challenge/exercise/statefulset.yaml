@@ -5,7 +5,7 @@ metadata:
   namespace: pv-lab-08
 spec:
   serviceName: counter
-  replicas: ________
+  replicas: 1
   selector:
     matchLabels:
       app: counter
@@ -21,7 +21,7 @@ spec:
             - sh
             - -c
             - |
-              file="________"
+              file="/data/start-count"
               if [ ! -f "$file" ]; then
                 echo 0 > "$file"
               fi
@@ -31,15 +31,15 @@ spec:
               echo "pod=$HOSTNAME starts=$count" > /data/status.txt
               sleep 3600
           volumeMounts:
-            - name: ________
-              mountPath: ________
+            - name: data
+              mountPath: /data
   volumeClaimTemplates:
     - metadata:
-        name: ________
+        name: data
       spec:
-        storageClassName: ________
+        storageClassName: pv-lab-final
         accessModes:
-          - ________
+          - ReadWriteOnce
         resources:
           requests:
-            storage: ________
+            storage: 1Gi
