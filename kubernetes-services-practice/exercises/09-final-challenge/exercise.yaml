@@ -9,14 +9,14 @@ metadata:
   name: quote-api
   namespace: service-lab-final
 spec:
-  replicas: ________
+  replicas: 3
   selector:
     matchLabels:
-      app: ________
+      app: quote-api
   template:
     metadata:
       labels:
-        app: ________
+        app: quote-api
     spec:
       containers:
         - name: quote-api
@@ -25,11 +25,11 @@ spec:
             - "-listen=:8080"
             - "-text=stable-networking-for-ephemeral-pods"
           ports:
-            - name: ________
+            - name: http
               containerPort: 8080
           readinessProbe:
             tcpSocket:
-              port: ________
+              port: 8080
             initialDelaySeconds: 1
             periodSeconds: 2
 ---
@@ -40,11 +40,11 @@ metadata:
   namespace: service-lab-final
 spec:
   selector:
-    app: ________
+    app: quote-api
   ports:
     - name: http
-      port: ________
-      targetPort: ________
+      port: 80
+      targetPort: http
 ---
 apiVersion: v1
 kind: Service
@@ -52,13 +52,13 @@ metadata:
   name: quote-api-headless
   namespace: service-lab-final
 spec:
-  clusterIP: ________
+  clusterIP: None
   selector:
-    app: ________
+    app: quote-api
   ports:
     - name: http
       port: 80
-      targetPort: ________
+      targetPort: http
 ---
 apiVersion: v1
 kind: Service
@@ -66,14 +66,14 @@ metadata:
   name: quote-api-public
   namespace: service-lab-final
 spec:
-  type: ________
+  type: NodePort
   selector:
-    app: ________
+    app: quote-api
   ports:
     - name: http
       port: 80
-      targetPort: ________
-      nodePort: ________
+      targetPort: http
+      nodePort: 30080
 ---
 apiVersion: v1
 kind: Pod
@@ -87,4 +87,4 @@ spec:
       command:
         - sh
         - -c
-        - "echo Stable service DNS: ________; sleep 3600"
+        - "echo Stable service DNS: quote-api; sleep 3600"

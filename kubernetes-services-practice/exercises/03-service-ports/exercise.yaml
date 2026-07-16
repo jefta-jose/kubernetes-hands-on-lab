@@ -25,7 +25,7 @@ spec:
             - "-listen=:8080"
             - "-text=service-port-80-to-container-port-8080"
           ports:
-            - name: ________
+            - name: web
               containerPort: 8080
 ---
 apiVersion: v1
@@ -35,11 +35,11 @@ metadata:
   namespace: service-lab-ports
 spec:
   selector:
-    app: ________
+    app: ports-demo
   ports:
     - name: http
-      port: ________
-      targetPort: ________
+      port: 80
+      targetPort: web
 ---
 apiVersion: v1
 kind: Pod

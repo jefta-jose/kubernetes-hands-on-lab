@@ -44,11 +44,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ________
+  name: inventory-api
   namespace: service-lab-alias
 spec:
-  type: ________
-  externalName: ________
+  type: ExternalName
+  externalName: backend.service-lab-alias.svc.cluster.local
 ---
 apiVersion: v1
 kind: Pod
