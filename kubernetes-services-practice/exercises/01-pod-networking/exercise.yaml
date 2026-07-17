@@ -6,10 +6,10 @@ metadata:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ________
+  name: echo-server
   namespace: service-lab-pods
   labels:
-    app: ________
+    app: echo
 spec:
   containers:
     - name: server
@@ -24,10 +24,10 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: ________
+  name: network-client
   namespace: service-lab-pods
 spec:
   containers:
     - name: client
-      image: ________
+      image: curlimages/curl:8.10.1
       command: ["sh", "-c", "sleep 3600"]

@@ -36,8 +36,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ________
-  namespace: ________
+  name: catalog
+  namespace: service-lab-dns
 spec:
   selector:
     app: catalog
@@ -58,4 +58,4 @@ spec:
       command:
         - sh
         - -c
-        - "echo DNS target: ________; sleep 3600"
+        - "echo DNS target: catalog.service-lab-dns.svc.cluster.local; sleep 3600"

@@ -22,7 +22,7 @@ spec:
           containerPort: 5678
       readinessProbe:
         tcpSocket:
-          port: ________
+          port: 5678
         initialDelaySeconds: 1
         periodSeconds: 2
 ---
@@ -45,7 +45,7 @@ spec:
           containerPort: 5678
       readinessProbe:
         tcpSocket:
-          port: ________
+          port: 3450
         initialDelaySeconds: 1
         periodSeconds: 2
 ---
@@ -56,11 +56,11 @@ metadata:
   namespace: service-lab-readiness
 spec:
   selector:
-    app: ________
+    app: readiness-demo
   ports:
     - name: http
       port: 80
-      targetPort: ________
+      targetPort: http
 ---
 apiVersion: v1
 kind: Pod

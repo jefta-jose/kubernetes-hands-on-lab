@@ -34,11 +34,11 @@ metadata:
   name: public-api
   namespace: service-lab-nodeport
 spec:
-  type: ________
+  type: NodePort
   selector:
     app: public-api
   ports:
     - name: http
-      port: ________
-      targetPort: ________
-      nodePort: ________
+      port: 80
+      targetPort: 8080
+      nodePort: 30080

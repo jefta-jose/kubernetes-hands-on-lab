@@ -9,14 +9,14 @@ metadata:
   name: quote
   namespace: service-lab-clusterip
 spec:
-  replicas: ________
+  replicas: 3
   selector:
     matchLabels:
-      app: ________
+      app: quote
   template:
     metadata:
       labels:
-        app: ________
+        app: quote
     spec:
       containers:
         - name: quote
@@ -31,16 +31,18 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ________
+  name: quote
   namespace: service-lab-clusterip
 spec:
   selector:
-    app: ________
+    app: quote
   ports:
     - name: http
-      port: ________
+      port: 80
       targetPort: 5678
 ---
+# so actually the pod is going to hit curl the svc which will in turn
+# route traffic to the deployment replicas
 apiVersion: v1
 kind: Pod
 metadata:
