@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sticky-session
+  namespace: ingress-lab
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: ________
+    nginx.ingress.kubernetes.io/session-cookie-name: ________
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: sticky.ingress.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: session-app
+                port:
+                  name: http

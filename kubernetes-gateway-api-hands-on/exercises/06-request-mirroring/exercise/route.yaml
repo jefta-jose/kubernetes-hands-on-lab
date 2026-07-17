@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: mirror-route
+  namespace: gateway-lab
+spec:
+  parentRefs:
+    - name: lab-gateway
+  hostnames:
+    - mirror.gateway.local
+  rules:
+    - backendRefs:
+        - name: ________
+          port: 8080
+      filters:
+        - type: ________
+          requestMirror:
+            backendRef:
+              name: ________
+              port: 8080

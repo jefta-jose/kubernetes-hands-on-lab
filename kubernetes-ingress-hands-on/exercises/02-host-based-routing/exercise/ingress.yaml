@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: host-routing
+  namespace: ingress-lab
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: ________
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ________
+                port:
+                  name: http
+    - host: ________
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ________
+                port:
+                  name: http

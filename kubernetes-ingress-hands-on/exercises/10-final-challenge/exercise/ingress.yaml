@@ -1,0 +1,48 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: final-challenge
+  namespace: ingress-lab
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "________"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "________"
+spec:
+  ingressClassName: ________
+  defaultBackend:
+    service:
+      name: ________
+      port:
+        name: http
+  tls:
+    - hosts:
+        - portal.final.ingress.local
+        - api.final.ingress.local
+      secretName: ________
+  rules:
+    - host: portal.final.ingress.local
+      http:
+        paths:
+          - path: /
+            pathType: ________
+            backend:
+              service:
+                name: frontend
+                port:
+                  name: http
+    - host: api.final.ingress.local
+      http:
+        paths:
+          - path: /quote
+            pathType: ________
+            backend:
+              service:
+                name: quote-api
+                port:
+                  name: http
+          - path: /questions
+            pathType: ________
+            backend:
+              service:
+                name: quiz-api
+                port:
+                  name: http

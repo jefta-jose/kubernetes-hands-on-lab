@@ -1,0 +1,575 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stable
+  namespace: gateway-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stable
+  template:
+    metadata:
+      labels:
+        app: stable
+    spec:
+      containers:
+        - name: server
+          image: python:3.13-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_NAME
+              value: stable
+            - name: APP_VERSION
+              value: v1
+          command: ["python", "-u", "-c"]
+          args:
+            - |
+                  import json
+                  import os
+                  from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+                  APP_NAME = os.getenv("APP_NAME", "unknown")
+                  APP_VERSION = os.getenv("APP_VERSION", "unknown")
+
+                  class Handler(BaseHTTPRequestHandler):
+                      def handle_request(self):
+                          length = int(self.headers.get("content-length", "0"))
+                          body = self.rfile.read(length).decode("utf-8", errors="replace") if length else ""
+                          payload = {
+                              "app": APP_NAME,
+                              "version": APP_VERSION,
+                              "method": self.command,
+                              "path": self.path,
+                              "headers": {key.lower(): value for key, value in self.headers.items()},
+                              "body": body,
+                          }
+                          encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+                          print(json.dumps(payload, separators=(",", ":")), flush=True)
+                          self.send_response(200)
+                          self.send_header("content-type", "application/json")
+                          self.send_header("content-length", str(len(encoded)))
+                          self.send_header("x-app-name", APP_NAME)
+                          self.send_header("x-app-version", APP_VERSION)
+                          self.end_headers()
+                          self.wfile.write(encoded)
+
+                      do_GET = handle_request
+                      do_POST = handle_request
+                      do_PUT = handle_request
+                      do_PATCH = handle_request
+                      do_DELETE = handle_request
+
+                      def log_message(self, format, *args):
+                          return
+
+                  ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+          resources:
+            requests:
+              cpu: 10m
+              memory: 24Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stable
+  namespace: gateway-lab
+spec:
+  selector:
+    app: stable
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary
+  namespace: gateway-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: canary
+  template:
+    metadata:
+      labels:
+        app: canary
+    spec:
+      containers:
+        - name: server
+          image: python:3.13-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_NAME
+              value: canary
+            - name: APP_VERSION
+              value: v2
+          command: ["python", "-u", "-c"]
+          args:
+            - |
+                  import json
+                  import os
+                  from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+                  APP_NAME = os.getenv("APP_NAME", "unknown")
+                  APP_VERSION = os.getenv("APP_VERSION", "unknown")
+
+                  class Handler(BaseHTTPRequestHandler):
+                      def handle_request(self):
+                          length = int(self.headers.get("content-length", "0"))
+                          body = self.rfile.read(length).decode("utf-8", errors="replace") if length else ""
+                          payload = {
+                              "app": APP_NAME,
+                              "version": APP_VERSION,
+                              "method": self.command,
+                              "path": self.path,
+                              "headers": {key.lower(): value for key, value in self.headers.items()},
+                              "body": body,
+                          }
+                          encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+                          print(json.dumps(payload, separators=(",", ":")), flush=True)
+                          self.send_response(200)
+                          self.send_header("content-type", "application/json")
+                          self.send_header("content-length", str(len(encoded)))
+                          self.send_header("x-app-name", APP_NAME)
+                          self.send_header("x-app-version", APP_VERSION)
+                          self.end_headers()
+                          self.wfile.write(encoded)
+
+                      do_GET = handle_request
+                      do_POST = handle_request
+                      do_PUT = handle_request
+                      do_PATCH = handle_request
+                      do_DELETE = handle_request
+
+                      def log_message(self, format, *args):
+                          return
+
+                  ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+          resources:
+            requests:
+              cpu: 10m
+              memory: 24Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary
+  namespace: gateway-lab
+spec:
+  selector:
+    app: canary
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  namespace: gateway-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: server
+          image: python:3.13-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_NAME
+              value: auth
+            - name: APP_VERSION
+              value: v1
+          command: ["python", "-u", "-c"]
+          args:
+            - |
+                  import json
+                  import os
+                  from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+                  APP_NAME = os.getenv("APP_NAME", "unknown")
+                  APP_VERSION = os.getenv("APP_VERSION", "unknown")
+
+                  class Handler(BaseHTTPRequestHandler):
+                      def handle_request(self):
+                          length = int(self.headers.get("content-length", "0"))
+                          body = self.rfile.read(length).decode("utf-8", errors="replace") if length else ""
+                          payload = {
+                              "app": APP_NAME,
+                              "version": APP_VERSION,
+                              "method": self.command,
+                              "path": self.path,
+                              "headers": {key.lower(): value for key, value in self.headers.items()},
+                              "body": body,
+                          }
+                          encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+                          print(json.dumps(payload, separators=(",", ":")), flush=True)
+                          self.send_response(200)
+                          self.send_header("content-type", "application/json")
+                          self.send_header("content-length", str(len(encoded)))
+                          self.send_header("x-app-name", APP_NAME)
+                          self.send_header("x-app-version", APP_VERSION)
+                          self.end_headers()
+                          self.wfile.write(encoded)
+
+                      do_GET = handle_request
+                      do_POST = handle_request
+                      do_PUT = handle_request
+                      do_PATCH = handle_request
+                      do_DELETE = handle_request
+
+                      def log_message(self, format, *args):
+                          return
+
+                  ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+          resources:
+            requests:
+              cpu: 10m
+              memory: 24Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  namespace: gateway-lab
+spec:
+  selector:
+    app: auth
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  namespace: gateway-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+    spec:
+      containers:
+        - name: server
+          image: python:3.13-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_NAME
+              value: orders
+            - name: APP_VERSION
+              value: v1
+          command: ["python", "-u", "-c"]
+          args:
+            - |
+                  import json
+                  import os
+                  from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+                  APP_NAME = os.getenv("APP_NAME", "unknown")
+                  APP_VERSION = os.getenv("APP_VERSION", "unknown")
+
+                  class Handler(BaseHTTPRequestHandler):
+                      def handle_request(self):
+                          length = int(self.headers.get("content-length", "0"))
+                          body = self.rfile.read(length).decode("utf-8", errors="replace") if length else ""
+                          payload = {
+                              "app": APP_NAME,
+                              "version": APP_VERSION,
+                              "method": self.command,
+                              "path": self.path,
+                              "headers": {key.lower(): value for key, value in self.headers.items()},
+                              "body": body,
+                          }
+                          encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+                          print(json.dumps(payload, separators=(",", ":")), flush=True)
+                          self.send_response(200)
+                          self.send_header("content-type", "application/json")
+                          self.send_header("content-length", str(len(encoded)))
+                          self.send_header("x-app-name", APP_NAME)
+                          self.send_header("x-app-version", APP_VERSION)
+                          self.end_headers()
+                          self.wfile.write(encoded)
+
+                      do_GET = handle_request
+                      do_POST = handle_request
+                      do_PUT = handle_request
+                      do_PATCH = handle_request
+                      do_DELETE = handle_request
+
+                      def log_message(self, format, *args):
+                          return
+
+                  ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+          resources:
+            requests:
+              cpu: 10m
+              memory: 24Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+  namespace: gateway-lab
+spec:
+  selector:
+    app: orders
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mirror
+  namespace: gateway-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mirror
+  template:
+    metadata:
+      labels:
+        app: mirror
+    spec:
+      containers:
+        - name: server
+          image: python:3.13-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_NAME
+              value: mirror
+            - name: APP_VERSION
+              value: observer
+          command: ["python", "-u", "-c"]
+          args:
+            - |
+                  import json
+                  import os
+                  from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+                  APP_NAME = os.getenv("APP_NAME", "unknown")
+                  APP_VERSION = os.getenv("APP_VERSION", "unknown")
+
+                  class Handler(BaseHTTPRequestHandler):
+                      def handle_request(self):
+                          length = int(self.headers.get("content-length", "0"))
+                          body = self.rfile.read(length).decode("utf-8", errors="replace") if length else ""
+                          payload = {
+                              "app": APP_NAME,
+                              "version": APP_VERSION,
+                              "method": self.command,
+                              "path": self.path,
+                              "headers": {key.lower(): value for key, value in self.headers.items()},
+                              "body": body,
+                          }
+                          encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+                          print(json.dumps(payload, separators=(",", ":")), flush=True)
+                          self.send_response(200)
+                          self.send_header("content-type", "application/json")
+                          self.send_header("content-length", str(len(encoded)))
+                          self.send_header("x-app-name", APP_NAME)
+                          self.send_header("x-app-version", APP_VERSION)
+                          self.end_headers()
+                          self.wfile.write(encoded)
+
+                      do_GET = handle_request
+                      do_POST = handle_request
+                      do_PUT = handle_request
+                      do_PATCH = handle_request
+                      do_DELETE = handle_request
+
+                      def log_message(self, format, *args):
+                          return
+
+                  ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+          resources:
+            requests:
+              cpu: 10m
+              memory: 24Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mirror
+  namespace: gateway-lab
+spec:
+  selector:
+    app: mirror
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shared-api
+  namespace: shared-services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shared-api
+  template:
+    metadata:
+      labels:
+        app: shared-api
+    spec:
+      containers:
+        - name: server
+          image: python:3.13-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: APP_NAME
+              value: shared-api
+            - name: APP_VERSION
+              value: v1
+          command: ["python", "-u", "-c"]
+          args:
+            - |
+                  import json
+                  import os
+                  from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+                  APP_NAME = os.getenv("APP_NAME", "unknown")
+                  APP_VERSION = os.getenv("APP_VERSION", "unknown")
+
+                  class Handler(BaseHTTPRequestHandler):
+                      def handle_request(self):
+                          length = int(self.headers.get("content-length", "0"))
+                          body = self.rfile.read(length).decode("utf-8", errors="replace") if length else ""
+                          payload = {
+                              "app": APP_NAME,
+                              "version": APP_VERSION,
+                              "method": self.command,
+                              "path": self.path,
+                              "headers": {key.lower(): value for key, value in self.headers.items()},
+                              "body": body,
+                          }
+                          encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+                          print(json.dumps(payload, separators=(",", ":")), flush=True)
+                          self.send_response(200)
+                          self.send_header("content-type", "application/json")
+                          self.send_header("content-length", str(len(encoded)))
+                          self.send_header("x-app-name", APP_NAME)
+                          self.send_header("x-app-version", APP_VERSION)
+                          self.end_headers()
+                          self.wfile.write(encoded)
+
+                      do_GET = handle_request
+                      do_POST = handle_request
+                      do_PUT = handle_request
+                      do_PATCH = handle_request
+                      do_DELETE = handle_request
+
+                      def log_message(self, format, *args):
+                          return
+
+                  ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+          resources:
+            requests:
+              cpu: 10m
+              memory: 24Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shared-api
+  namespace: shared-services
+spec:
+  selector:
+    app: shared-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

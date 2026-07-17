@@ -1,0 +1,63 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: final-application
+  namespace: team-a
+spec:
+  parentRefs:
+    - name: production-gateway
+      namespace: infra
+      sectionName: ________
+  hostnames:
+    - app.final.gateway.local
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+          headers:
+            - name: X-Release
+              type: Exact
+              value: ________
+      backendRefs:
+        - name: canary
+          namespace: gateway-lab
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      backendRefs:
+        - name: stable
+          namespace: gateway-lab
+          port: 8080
+          weight: ________
+        - name: canary
+          namespace: gateway-lab
+          port: 8080
+          weight: ________
+      filters:
+        - type: ________
+          requestMirror:
+            backendRef:
+              name: mirror
+              namespace: gateway-lab
+              port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /legacy
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ________
+              replacePrefixMatch: /api
+      backendRefs:
+        - name: stable
+          namespace: gateway-lab
+          port: 8080
+    - backendRefs:
+        - name: ________
+          namespace: shared-services
+          port: 8080

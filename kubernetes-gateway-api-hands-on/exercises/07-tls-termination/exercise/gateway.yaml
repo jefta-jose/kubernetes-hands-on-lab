@@ -1,0 +1,27 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: lab-gateway
+  namespace: gateway-lab
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "*.gateway.local"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: ________
+      protocol: ________
+      port: ________
+      hostname: ________
+      tls:
+        mode: ________
+        certificateRefs:
+          - kind: Secret
+            name: ________
+      allowedRoutes:
+        namespaces:
+          from: Same

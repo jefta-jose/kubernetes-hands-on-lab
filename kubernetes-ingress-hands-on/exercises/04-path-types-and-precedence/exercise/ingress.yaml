@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: path-types
+  namespace: ingress-lab
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: paths.ingress.local
+      http:
+        paths:
+          - path: /
+            pathType: ________
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+          - path: /api
+            pathType: ________
+            backend:
+              service:
+                name: quiz-api
+                port:
+                  number: 80
+          - path: /api/quote
+            pathType: ________
+            backend:
+              service:
+                name: quote-api
+                port:
+                  number: 80

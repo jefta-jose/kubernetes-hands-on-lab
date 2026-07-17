@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-final-route-to-app-services
+  namespace: gateway-lab
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: ________
+  to:
+    - group: ""
+      kind: Service
+      name: stable
+    - group: ""
+      kind: Service
+      name: ________
+    - group: ""
+      kind: Service
+      name: mirror

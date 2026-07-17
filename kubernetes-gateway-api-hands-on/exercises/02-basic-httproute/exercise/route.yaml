@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: basic-route
+  namespace: gateway-lab
+spec:
+  parentRefs:
+    - name: ________
+      kind: Gateway
+  hostnames:
+    - ________
+  rules:
+    - backendRefs:
+        - name: ________
+          port: ________

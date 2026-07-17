@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tls-ingress
+  namespace: ingress-lab
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ________
+      secretName: ________
+  rules:
+    - host: ________
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

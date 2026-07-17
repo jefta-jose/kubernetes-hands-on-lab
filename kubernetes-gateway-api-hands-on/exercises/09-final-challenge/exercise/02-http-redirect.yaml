@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: final-http-redirect
+  namespace: team-a
+spec:
+  parentRefs:
+    - name: production-gateway
+      namespace: infra
+      sectionName: ________
+  hostnames:
+    - app.final.gateway.local
+  rules:
+    - filters:
+        - type: ________
+          requestRedirect:
+            scheme: ________
+            port: 443
+            statusCode: ________

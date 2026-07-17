@@ -1,0 +1,29 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: filter-route
+  namespace: gateway-lab
+spec:
+  parentRefs:
+    - name: lab-gateway
+  hostnames:
+    - filters.gateway.local
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: ________
+      filters:
+        - type: ________
+          urlRewrite:
+            path:
+              type: ________
+              replacePrefixMatch: ________
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - name: ________
+                value: ________
+      backendRefs:
+        - name: stable
+          port: 8080
