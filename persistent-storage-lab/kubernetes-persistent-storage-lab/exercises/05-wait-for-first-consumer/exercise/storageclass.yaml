@@ -2,7 +2,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: pv-lab-delayed
-provisioner: ________
+provisioner: k8s.io/minikube-hostpath
 reclaimPolicy: Delete
-volumeBindingMode: ________
+volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: false

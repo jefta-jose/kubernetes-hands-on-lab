@@ -4,9 +4,9 @@ metadata:
   name: app-data
   namespace: pv-lab-02
 spec:
-  storageClassName: ________
+  storageClassName: standard
   accessModes:
-    - ________
+    - ReadWriteOnce
   resources:
     requests:
-      storage: ________
+      storage: 1Gi

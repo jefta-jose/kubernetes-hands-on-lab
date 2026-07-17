@@ -11,12 +11,12 @@ spec:
         - sh
         - -c
         - |
-          echo "created by the first pod" > ________
+          echo "created by the first pod" > /data/identity.txt
           sleep 3600
       volumeMounts:
         - name: data
-          mountPath: ________
+          mountPath: /data
   volumes:
     - name: data
       persistentVolumeClaim:
-        claimName: ________
+        claimName: shared-data

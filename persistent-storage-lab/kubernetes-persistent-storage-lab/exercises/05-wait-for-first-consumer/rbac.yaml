@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: minikube-hostpath-node-reader
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: minikube-hostpath-node-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: minikube-hostpath-node-reader
+# add permissions to the service account
+subjects:
+  - kind: ServiceAccount
+    name: storage-provisioner
+    namespace: kube-system
