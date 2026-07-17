@@ -6,8 +6,8 @@ metadata:
 spec:
   restartPolicy: Always
   volumes:
-    - name: ________
-      ________: {}
+    - name: counter-data
+      emptyDir: {}
   containers:
     - name: counter
       image: busybox:1.36
@@ -23,5 +23,5 @@ spec:
             sleep 2
           done
       volumeMounts:
-        - name: ________
-          mountPath: ________
+        - name: counter-data
+          mountPath: /data

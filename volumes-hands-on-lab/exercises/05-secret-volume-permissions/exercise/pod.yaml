@@ -4,19 +4,30 @@ metadata:
   name: secret-volume-demo
   namespace: volumes-lab
 spec:
+  # This tells Kubernetes that mounted volume files should be accessible 
+  # through filesystem group 101. Kubernetes applies fsGroup at the Pod level
+  # because volumes belong to the Pod, not to one individual container.
   securityContext:
-    fsGroup: ________
+    fsGroup: 101
   volumes:
     - name: credentials
       secret:
-        secretName: ________
-        defaultMode: ________
+        secretName: application-credentials
+        # defaultMode controls permissions inside the volume
+        # it expects Unix permission bits, not a Boolean or description. Use:
+        # defaultMode: 0440
+          # 0440 means:
+          # Owner:  read
+          # Group:  read
+          # Others: no access
+        defaultMode: 0440
   containers:
     - name: reader
       image: busybox:1.36
       securityContext:
-        runAsUser: ________
-        runAsGroup: ________
+        # matches the files system group with read permissions to the secret
+        runAsUser: 101
+        runAsGroup: 101
         runAsNonRoot: true
       command:
         - sh
@@ -27,5 +38,5 @@ spec:
           sleep 3600
       volumeMounts:
         - name: credentials
-          mountPath: ________
-          readOnly: ________
+          mountPath: /credentials
+          readOnly: true

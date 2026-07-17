@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ________
+  name: config-map-volume
   namespace: volumes-lab
 data:
   title: Kubernetes Volumes Lab

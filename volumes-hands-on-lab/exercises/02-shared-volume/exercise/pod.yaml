@@ -5,7 +5,7 @@ metadata:
   namespace: volumes-lab
 spec:
   volumes:
-    - name: ________
+    - name: web-content
       emptyDir: {}
   containers:
     - name: content-writer
@@ -19,15 +19,16 @@ spec:
             sleep 5
           done
       volumeMounts:
-        - name: ________
-          mountPath: ________
+        - name: web-content
+          mountPath: /writer
 
     - name: nginx
       image: nginx:alpine
       ports:
         - name: http
-          containerPort: ________
+          containerPort: 80
       volumeMounts:
-        - name: ________
-          mountPath: ________
-          readOnly: ________
+        - name: web-content
+          mountPath: /usr/share/nginx/html
+          readOnly: true
+

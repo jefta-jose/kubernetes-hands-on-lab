@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ________
+  name: volume-lab-web
   namespace: volumes-lab
 spec:
   selector:
-    app: ________
+    app: volume-lab-web
   ports:
     - name: http
-      port: ________
-      targetPort: ________
+      port: 80
+      targetPort: 80
