@@ -6,23 +6,23 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: ________
+    - host: app.ingress.local
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: ________
+                name: frontend
                 port:
                   name: http
-    - host: ________
+    - host: api.ingress.local
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: ________
+                name: quote-api
                 port:
                   name: http

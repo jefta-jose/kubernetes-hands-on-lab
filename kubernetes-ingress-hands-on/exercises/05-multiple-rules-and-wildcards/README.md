@@ -24,17 +24,40 @@ Quote the wildcard hostname in YAML.
 
 ```bash
 kubectl apply -f /tmp/05-wildcard.yaml
-export INGRESS_IP="$(minikube ip)"
-
-curl --resolve admin.apps.ingress.local:80:"$INGRESS_IP" \
-  http://admin.apps.ingress.local/
-
-curl --resolve dev.apps.ingress.local:80:"$INGRESS_IP" \
-  http://dev.apps.ingress.local/
-
-curl -i --resolve deep.dev.apps.ingress.local:80:"$INGRESS_IP" \
-  http://deep.dev.apps.ingress.local/
 ```
+
+In a separate terminal, leave the tunnel running:
+
+```bash
+kubectl port-forward -n ingress-nginx \
+  service/ingress-nginx-controller \
+  8080:80 8443:443
+```
+
+This selects the `ingress-nginx-controller` Service in the `ingress-nginx`
+namespace. `8080:80` maps local HTTP to Service HTTP, and `8443:443` maps local
+HTTPS to Service HTTPS. Keep the command running to keep the connection open.
+
+Back in the exercise terminal:
+
+```bash
+export INGRESS_HOST=127.0.0.1
+export INGRESS_HTTP_PORT=8080
+
+curl --resolve admin.apps.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://admin.apps.ingress.local:"$INGRESS_HTTP_PORT"/
+
+curl --resolve dev.apps.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://dev.apps.ingress.local:"$INGRESS_HTTP_PORT"/
+
+curl -i --resolve deep.dev.apps.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://deep.dev.apps.ingress.local:"$INGRESS_HTTP_PORT"/
+```
+
+The variables point curl at the local end of the connection,
+`127.0.0.1:8080`. Each `--resolve` value is `hostname:port:address`; curl
+connects locally but retains the hostname in the request. That lets NGINX test
+the exact, one-label wildcard, and nonmatching hostnames without configuring DNS.
 
 ## 5. Progressive Hints
 

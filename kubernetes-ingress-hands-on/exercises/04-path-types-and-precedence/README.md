@@ -23,20 +23,43 @@ cp exercises/04-path-types-and-precedence/exercise/ingress.yaml \
 
 ```bash
 kubectl apply -f /tmp/04-path-types.yaml
-export INGRESS_IP="$(minikube ip)"
-
-curl --resolve paths.ingress.local:80:"$INGRESS_IP" \
-  http://paths.ingress.local/
-
-curl --resolve paths.ingress.local:80:"$INGRESS_IP" \
-  http://paths.ingress.local/api
-
-curl --resolve paths.ingress.local:80:"$INGRESS_IP" \
-  http://paths.ingress.local/api/quote
-
-curl --resolve paths.ingress.local:80:"$INGRESS_IP" \
-  http://paths.ingress.local/api/quote/1
 ```
+
+In a separate terminal, leave the tunnel running:
+
+```bash
+kubectl port-forward -n ingress-nginx \
+  service/ingress-nginx-controller \
+  8080:80 8443:443
+```
+
+This creates a live connection to the `ingress-nginx-controller` Service in the
+`ingress-nginx` namespace. Mappings are `host-port:Service-port`, so HTTP uses
+`8080:80` and HTTPS uses `8443:443`. Leave this terminal running.
+
+Back in the exercise terminal:
+
+```bash
+export INGRESS_HOST=127.0.0.1
+export INGRESS_HTTP_PORT=8080
+
+curl --resolve paths.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://paths.ingress.local:"$INGRESS_HTTP_PORT"/
+
+curl --resolve paths.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://paths.ingress.local:"$INGRESS_HTTP_PORT"/api
+
+curl --resolve paths.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://paths.ingress.local:"$INGRESS_HTTP_PORT"/api/quote
+
+curl --resolve paths.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://paths.ingress.local:"$INGRESS_HTTP_PORT"/api/quote/1
+```
+
+The exports name the local endpoint, `127.0.0.1:8080`. Curl reads `--resolve`
+as `hostname:port:address`: it connects to that local endpoint but preserves
+`paths.ingress.local` as the HTTP hostname. The different URL paths then let
+NGINX demonstrate exact, prefix, and precedence behavior.
 
 ## 5. Progressive Hints
 

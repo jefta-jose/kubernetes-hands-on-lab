@@ -9,14 +9,14 @@ spec:
     - host: routes.ingress.local
       http:
         paths:
-          - path: ________
+          - path: /quotes
             pathType: Prefix
             backend:
               service:
                 name: quote-api
                 port:
                   number: 80
-          - path: ________
+          - path: /questions
             pathType: Prefix
             backend:
               service:

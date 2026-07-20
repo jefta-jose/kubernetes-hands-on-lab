@@ -20,7 +20,10 @@ Ingress controller / reverse proxy
   +--> session Service  --> session Pods
 ```
 
-The exercise manifests contain `________` placeholders. Replace only those placeholders. Completed, runnable manifests are provided under each exercise's `solution/` directory.
+The manifests in Exercises 01–10 contain `________` placeholders. Replace only
+those placeholders. Completed, runnable manifests are provided under those
+exercises' `solution/` directories. Exercise 00 is command-driven because it
+installs the controller that all the manifest exercises depend on.
 
 ## Project Structure
 
@@ -38,6 +41,7 @@ kubernetes-ingress-hands-on/
 │   ├── namespace.yaml
 │   └── apps.yaml
 └── exercises/
+    ├── 00-install-ingress-controller/
     ├── 01-basic-ingress/
     ├── 02-host-based-routing/
     ├── 03-path-based-routing/
@@ -70,11 +74,22 @@ make check
 
 ## Start the Lab
 
-From the project root:
+From the project root, choose one setup approach.
+
+For the guided approach, start Minikube, complete Exercise 00, and deploy the
+applications when that exercise instructs you to:
+
+```bash
+minikube start --driver=docker
+```
+
+Then follow [Exercise 00](exercises/00-install-ingress-controller/README.md).
+
+Alternatively, the automated setup performs the same installation and also
+deploys the applications:
 
 ```bash
 make setup
-make apps
 ```
 
 The setup script:
@@ -92,30 +107,79 @@ kubectl get services -n ingress-lab
 kubectl get ingressclass
 ```
 
-Save the Minikube IP:
+Expose the ingress controller to your host. Keep this command running in a
+separate terminal for the duration of the lab:
 
 ```bash
-export INGRESS_IP="$(minikube ip)"
-echo "$INGRESS_IP"
+kubectl port-forward -n ingress-nginx \
+  service/ingress-nginx-controller \
+  8080:80 8443:443
 ```
 
-If ingress traffic is not reachable from your host, run this in a separate terminal:
+Here is how to read that command:
+
+- `kubectl port-forward` creates a temporary connection from ports on your host
+  to ports inside the cluster. It runs only while this command remains running.
+- `-n ingress-nginx` tells `kubectl` to look in the `ingress-nginx` namespace.
+  Minikube creates that namespace when its ingress add-on is enabled.
+- `service/ingress-nginx-controller` selects a Kubernetes resource by
+  `<resource-type>/<resource-name>`. It means the Service named
+  `ingress-nginx-controller`, which is the entry point in front of the NGINX
+  ingress-controller Pods. You can inspect it with
+  `kubectl get service ingress-nginx-controller -n ingress-nginx`.
+- Port mappings use `LOCAL_PORT:CLUSTER_PORT`. Therefore, `8080:80` sends HTTP
+  from port `8080` on your host to port `80` of the Service, and `8443:443`
+  sends HTTPS from host port `8443` to Service port `443`.
+
+Ports `8080` and `8443` are used on the host because the standard ports `80`
+and `443` may already be occupied and often require administrator privileges.
+
+This port-forward is required when the Docker-driver Minikube IP is a
+container-only address.
+In the terminal where you run the exercises, define the host-reachable endpoint:
 
 ```bash
-minikube tunnel
+export INGRESS_HOST=127.0.0.1
+export INGRESS_HTTP_PORT=8080
+export INGRESS_HTTPS_PORT=8443
 ```
+
+`export` creates shell environment variables so later commands can reuse the
+address and ports without repeating them. `127.0.0.1` is the loopback address:
+it means "this host", where `kubectl port-forward` is listening.
+
+An HTTP test has this general form:
+
+```bash
+curl --resolve HOSTNAME:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://HOSTNAME:"$INGRESS_HTTP_PORT"/
+```
+
+`--resolve` gives curl a temporary hostname mapping in the form
+`hostname:port:address`. It tells curl to connect to `127.0.0.1:8080` without
+changing the hostname in the URL. That distinction matters: the network
+connection goes through the local port-forward, but NGINX still receives the
+exercise hostname in the HTTP `Host` header and can select the correct Ingress
+rule. For HTTPS, keeping the hostname also supplies the correct TLS SNI name.
+This affects only that curl command; it does not edit DNS or `/etc/hosts`.
+
+`minikube tunnel` is not used by these exercises;
+it targets `LoadBalancer` Services, while the Minikube ingress add-on commonly
+exposes its controller through a different Service type.
 
 ## Recommended Exercise Workflow
 
 For each exercise:
 
-1. Read the exercise `README.md`.
-2. Copy the incomplete file to `/tmp`.
-3. Replace every `________` placeholder.
-4. Apply the completed file.
-5. Run the provided tests.
-6. Compare your work with the solution.
-7. Delete the resource before moving on.
+1. Complete Exercise 00 once to install the controller and applications.
+2. Read the exercise `README.md`.
+3. Copy the incomplete file to `/tmp`.
+4. Replace every `________` placeholder.
+5. Apply the completed file.
+6. Start the ingress-controller port-forward if it is not already running.
+7. Run the provided tests.
+8. Compare your work with the solution.
+9. Delete the resource before moving on.
 
 Example:
 
@@ -137,6 +201,7 @@ The command should print nothing.
 
 | Exercise | Main concept |
 |---|---|
+| 00 | Install and verify the NGINX ingress controller |
 | 01 | Basic Ingress rule |
 | 02 | Host-based routing |
 | 03 | Path-based routing |

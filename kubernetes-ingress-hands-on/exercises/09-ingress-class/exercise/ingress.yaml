@@ -4,7 +4,7 @@ metadata:
   name: class-selection
   namespace: ingress-lab
 spec:
-  ingressClassName: ________
+  ingressClassName: nginx
   rules:
     - host: class.ingress.local
       http:

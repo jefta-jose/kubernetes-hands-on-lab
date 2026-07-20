@@ -10,21 +10,21 @@ spec:
       http:
         paths:
           - path: /
-            pathType: ________
+            pathType: Prefix
             backend:
               service:
                 name: frontend
                 port:
                   number: 80
           - path: /api
-            pathType: ________
+            pathType: Prefix
             backend:
               service:
                 name: quiz-api
                 port:
                   number: 80
           - path: /api/quote
-            pathType: ________
+            pathType: Exact
             backend:
               service:
                 name: quote-api

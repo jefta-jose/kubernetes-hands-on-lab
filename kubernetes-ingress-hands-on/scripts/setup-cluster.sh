@@ -24,4 +24,5 @@ kubectl wait \
 
 echo
 echo "Ingress lab is ready."
-echo "Run: export INGRESS_IP=\"\$(minikube ip -p $PROFILE)\""
+echo "In a separate terminal, expose the ingress controller to your host:"
+echo "kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 8080:80 8443:443"

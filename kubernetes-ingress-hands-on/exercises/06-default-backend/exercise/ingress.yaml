@@ -7,9 +7,9 @@ spec:
   ingressClassName: nginx
   defaultBackend:
     service:
-      name: ________
+      name: custom-404
       port:
-        name: ________
+        name: http
   rules:
     - host: known.default.ingress.local
       http:

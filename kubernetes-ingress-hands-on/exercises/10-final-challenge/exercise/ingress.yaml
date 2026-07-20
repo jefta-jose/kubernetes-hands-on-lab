@@ -4,26 +4,26 @@ metadata:
   name: final-challenge
   namespace: ingress-lab
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "________"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "________"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30s"
 spec:
-  ingressClassName: ________
+  ingressClassName: nginx
   defaultBackend:
     service:
-      name: ________
+      name: custom-404
       port:
         name: http
   tls:
     - hosts:
         - portal.final.ingress.local
         - api.final.ingress.local
-      secretName: ________
+      secretName: final-ingress-tls
   rules:
     - host: portal.final.ingress.local
       http:
         paths:
           - path: /
-            pathType: ________
+            pathType: Prefix
             backend:
               service:
                 name: frontend
@@ -33,14 +33,14 @@ spec:
       http:
         paths:
           - path: /quote
-            pathType: ________
+            pathType: Exact
             backend:
               service:
                 name: quote-api
                 port:
                   name: http
           - path: /questions
-            pathType: ________
+            pathType: Prefix
             backend:
               service:
                 name: quiz-api
