@@ -4,8 +4,8 @@ metadata:
   name: sticky-session
   namespace: ingress-lab
   annotations:
-    nginx.ingress.kubernetes.io/affinity: ________
-    nginx.ingress.kubernetes.io/session-cookie-name: ________
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-name: INGRESS_LAB_SESSION
 spec:
   ingressClassName: nginx
   rules:

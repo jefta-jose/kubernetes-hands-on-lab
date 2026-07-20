@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: ________
+    - host: admin.apps.ingress.local
       http:
         paths:
           - path: /
@@ -16,7 +16,7 @@ spec:
                 name: frontend
                 port:
                   number: 80
-    - host: ________
+    - host: "*.apps.ingress.local"
       http:
         paths:
           - path: /

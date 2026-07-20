@@ -32,11 +32,35 @@ Generate the local certificate and Secret:
 
 ```bash
 kubectl apply -f /tmp/07-tls-ingress.yaml
-export INGRESS_IP="$(minikube ip)"
-
-curl -vk --resolve tls.ingress.local:443:"$INGRESS_IP" \
-  https://tls.ingress.local/
 ```
+
+In a separate terminal, leave the tunnel running:
+
+```bash
+kubectl port-forward -n ingress-nginx \
+  service/ingress-nginx-controller \
+  8080:80 8443:443
+```
+
+This finds the `ingress-nginx-controller` Service in the `ingress-nginx`
+namespace. The mappings use `host-port:Service-port`: `8080:80` forwards HTTP,
+and `8443:443` forwards HTTPS. Keep the command running during the test.
+
+Back in the exercise terminal:
+
+```bash
+export INGRESS_HOST=127.0.0.1
+export INGRESS_HTTPS_PORT=8443
+
+curl -vk --resolve tls.ingress.local:"$INGRESS_HTTPS_PORT":"$INGRESS_HOST" \
+  https://tls.ingress.local:"$INGRESS_HTTPS_PORT"/
+```
+
+The exports describe the local HTTPS listener, `127.0.0.1:8443`. `--resolve`
+uses `hostname:port:address`, so curl connects to that listener but retains
+`tls.ingress.local` for both the TLS SNI name and the HTTP hostname. That allows
+NGINX to choose the matching certificate and Ingress rule. `-k` accepts the
+self-signed lab certificate; `-v` displays the TLS and request details.
 
 Inspect the Secret:
 
@@ -73,7 +97,8 @@ Regenerate the Secret with the exact hostname.
 
 ### HTTPS is unreachable
 
-Check that the ingress controller exposes port `443`:
+Confirm that the controller exposes port `443` and that the port-forward is
+still running and reports forwarding on `127.0.0.1:8443`:
 
 ```bash
 kubectl get service -n ingress-nginx

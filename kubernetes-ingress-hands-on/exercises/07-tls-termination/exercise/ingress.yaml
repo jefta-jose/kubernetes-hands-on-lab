@@ -7,10 +7,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - ________
-      secretName: ________
+        - tls.ingress.local
+      secretName: tls-ingress-local
   rules:
-    - host: ________
+    - host: tls.ingress.local
       http:
         paths:
           - path: /

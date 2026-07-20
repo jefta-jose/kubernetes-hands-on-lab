@@ -63,50 +63,77 @@ rm -rf "$TMP_DIR"
 
 ```bash
 kubectl apply -f /tmp/10-final-challenge.yaml
-export INGRESS_IP="$(minikube ip)"
 ```
+
+In a separate terminal, leave the tunnel running:
+
+```bash
+kubectl port-forward -n ingress-nginx \
+  service/ingress-nginx-controller \
+  8080:80 8443:443
+```
+
+This connects to the `ingress-nginx-controller` Service in the `ingress-nginx`
+namespace. Mappings use `host-port:Service-port`: `8080:80` forwards local HTTP
+to port `80` and `8443:443` forwards local HTTPS to port `443`. Keep it running.
+
+Back in the exercise terminal:
+
+```bash
+export INGRESS_HOST=127.0.0.1
+export INGRESS_HTTP_PORT=8080
+export INGRESS_HTTPS_PORT=8443
+```
+
+These exports name the local listeners: `127.0.0.1:8080` for HTTP and
+`127.0.0.1:8443` for HTTPS. Each `--resolve` value below follows
+`hostname:port:address`. Curl therefore connects through the local listener but
+retains the URL hostname for the HTTP `Host` header and, with HTTPS, TLS SNI.
+That lets NGINX choose the intended host rule and certificate without real DNS.
 
 Confirm HTTP redirect:
 
 ```bash
 curl -I \
-  --resolve portal.final.ingress.local:80:"$INGRESS_IP" \
-  http://portal.final.ingress.local/
+  --resolve portal.final.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://portal.final.ingress.local:"$INGRESS_HTTP_PORT"/
 ```
 
 Test the frontend over HTTPS:
 
 ```bash
 curl -sk \
-  --resolve portal.final.ingress.local:443:"$INGRESS_IP" \
-  https://portal.final.ingress.local/
+  --resolve portal.final.ingress.local:"$INGRESS_HTTPS_PORT":"$INGRESS_HOST" \
+  https://portal.final.ingress.local:"$INGRESS_HTTPS_PORT"/
 ```
 
 Test the exact quote route:
 
 ```bash
 curl -sk \
-  --resolve api.final.ingress.local:443:"$INGRESS_IP" \
-  https://api.final.ingress.local/quote
+  --resolve api.final.ingress.local:"$INGRESS_HTTPS_PORT":"$INGRESS_HOST" \
+  https://api.final.ingress.local:"$INGRESS_HTTPS_PORT"/quote
 ```
 
 Test the quiz prefix route:
 
 ```bash
 curl -sk \
-  --resolve api.final.ingress.local:443:"$INGRESS_IP" \
-  https://api.final.ingress.local/questions/42
+  --resolve api.final.ingress.local:"$INGRESS_HTTPS_PORT":"$INGRESS_HOST" \
+  https://api.final.ingress.local:"$INGRESS_HTTPS_PORT"/questions/42
 ```
 
 Test the fallback using an unmatched host:
 
 ```bash
 curl -ski \
-  --resolve unknown.final.ingress.local:443:"$INGRESS_IP" \
-  https://unknown.final.ingress.local/
+  --resolve unknown.final.ingress.local:"$INGRESS_HTTPS_PORT":"$INGRESS_HOST" \
+  https://unknown.final.ingress.local:"$INGRESS_HTTPS_PORT"/
 ```
 
 Because the certificate does not include the unknown hostname, `-k` is required for this local fallback test.
+The HTTP redirect points to the standard HTTPS port (`443`); test HTTPS directly
+on local port `8443` as shown above rather than asking curl to follow the redirect.
 
 ## 5. Progressive Hints
 

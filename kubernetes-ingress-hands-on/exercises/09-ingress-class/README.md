@@ -28,11 +28,34 @@ cp exercises/09-ingress-class/exercise/ingress.yaml \
 ```bash
 kubectl apply -f /tmp/09-ingress-class.yaml
 kubectl describe ingress class-selection -n ingress-lab
-
-export INGRESS_IP="$(minikube ip)"
-curl --resolve class.ingress.local:80:"$INGRESS_IP" \
-  http://class.ingress.local/
 ```
+
+In a separate terminal, leave the tunnel running:
+
+```bash
+kubectl port-forward -n ingress-nginx \
+  service/ingress-nginx-controller \
+  8080:80 8443:443
+```
+
+This selects the `ingress-nginx-controller` Service in the `ingress-nginx`
+namespace. The format is `host-port:Service-port`: `8080:80` forwards HTTP and
+`8443:443` forwards HTTPS. Leave it running while testing.
+
+Back in the exercise terminal:
+
+```bash
+export INGRESS_HOST=127.0.0.1
+export INGRESS_HTTP_PORT=8080
+
+curl --resolve class.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://class.ingress.local:"$INGRESS_HTTP_PORT"/
+```
+
+The exports point to the local listener at `127.0.0.1:8080`. Curl interprets
+`--resolve` as `hostname:port:address`; it connects to the listener but retains
+`class.ingress.local` as the request hostname. A successful response shows that
+the selected IngressClass caused the NGINX controller to process the rule.
 
 ## 5. Progressive Hints
 

@@ -22,23 +22,46 @@ cp exercises/08-cookie-session-affinity/exercise/ingress.yaml \
 
 ```bash
 kubectl apply -f /tmp/08-sticky-session.yaml
-export INGRESS_IP="$(minikube ip)"
+```
+
+In a separate terminal, leave the tunnel running:
+
+```bash
+kubectl port-forward -n ingress-nginx \
+  service/ingress-nginx-controller \
+  8080:80 8443:443
+```
+
+This connects host ports to the `ingress-nginx-controller` Service in the
+`ingress-nginx` namespace. `8080:80` maps local HTTP to Service HTTP, while
+`8443:443` maps local HTTPS to Service HTTPS. It works only while it is running.
+
+Back in the exercise terminal:
+
+```bash
+export INGRESS_HOST=127.0.0.1
+export INGRESS_HTTP_PORT=8080
 rm -f /tmp/ingress-lab-cookies.txt
 
 curl -i \
-  --resolve sticky.ingress.local:80:"$INGRESS_IP" \
+  --resolve sticky.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
   -c /tmp/ingress-lab-cookies.txt \
-  http://sticky.ingress.local/
+  http://sticky.ingress.local:"$INGRESS_HTTP_PORT"/
 ```
+
+The exported values identify the local endpoint, `127.0.0.1:8080`.
+`--resolve` means `hostname:port:address`, so curl connects locally while NGINX
+still sees `sticky.ingress.local`. The `-c` option then saves the response cookie
+to the named file so later requests can send it back with `-b`.
 
 Repeat requests using the stored cookie:
 
 ```bash
 for i in 1 2 3 4 5; do
   curl -s \
-    --resolve sticky.ingress.local:80:"$INGRESS_IP" \
+    --resolve sticky.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
     -b /tmp/ingress-lab-cookies.txt \
-    http://sticky.ingress.local/ |
+    http://sticky.ingress.local:"$INGRESS_HTTP_PORT"/ |
   grep -o 'Pod: [^<]*'
 done
 ```

@@ -24,14 +24,37 @@ cp exercises/06-default-backend/exercise/ingress.yaml \
 
 ```bash
 kubectl apply -f /tmp/06-default-backend.yaml
-export INGRESS_IP="$(minikube ip)"
-
-curl --resolve known.default.ingress.local:80:"$INGRESS_IP" \
-  http://known.default.ingress.local/
-
-curl -i --resolve unknown.default.ingress.local:80:"$INGRESS_IP" \
-  http://unknown.default.ingress.local/
 ```
+
+In a separate terminal, leave the tunnel running:
+
+```bash
+kubectl port-forward -n ingress-nginx \
+  service/ingress-nginx-controller \
+  8080:80 8443:443
+```
+
+This forwards to the `ingress-nginx-controller` Service in the `ingress-nginx`
+namespace. Port mappings are `host-port:Service-port`: `8080:80` is HTTP and
+`8443:443` is HTTPS. The forwarding stops when this command stops.
+
+Back in the exercise terminal:
+
+```bash
+export INGRESS_HOST=127.0.0.1
+export INGRESS_HTTP_PORT=8080
+
+curl --resolve known.default.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://known.default.ingress.local:"$INGRESS_HTTP_PORT"/
+
+curl -i --resolve unknown.default.ingress.local:"$INGRESS_HTTP_PORT":"$INGRESS_HOST" \
+  http://unknown.default.ingress.local:"$INGRESS_HTTP_PORT"/
+```
+
+The exported endpoint is the local listener, `127.0.0.1:8080`. Curl's
+`--resolve` syntax is `hostname:port:address`, so both requests travel through
+that listener while retaining different HTTP hostnames. The known hostname
+matches a rule; the unknown one demonstrates the default backend.
 
 ## 5. Progressive Hints
 
